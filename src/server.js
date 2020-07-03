@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { request } = require('express');
-const { ObjectId } = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
+const slackTemplate = require('./utils/slackTemplate');
 require('dotenv').config();
 
 const dbUrl = process.env.BD_URL;
@@ -33,6 +32,16 @@ app.get('/quotes', (resquest, response) => {
     .catch(err => console.log(err));
 });
 
+app.get('/slack', (request, response) => {
+  const data = db.db('platzi-quotes');
+  data.collection('quotes').find().toArray()
+    .then(results => {
+      let slackQuote = slackTemplate(results[1]);
+      response.json(slackQuote);
+    })
+    .catch(err => console.log(err));
+});
+
 app.post('/quotes', (request, response) => {
   const data = db.db('platzi-quotes');
   data.collection('quotes').insertOne(request.body)
@@ -41,6 +50,7 @@ app.post('/quotes', (request, response) => {
     })
     .catch(err => console.log(err));
 });
+
 
 app.put('/quotes', (request, response) => {
   const data = db.db('platzi-quotes');
