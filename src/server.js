@@ -44,7 +44,8 @@ app.get('/slack', (request, response) => {
 
 app.post('/quotes', (request, response) => {
   const data = db.db('platzi-quotes');
-  data.collection('quotes').insertOne(request.body)
+  const parseData = JSON.parse(request.body);
+  data.collection('quotes').insertOne(parseData)
     .then(results => {
       response.json(results);
     })
